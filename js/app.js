@@ -52,3 +52,51 @@ async function loadLeads() {
 }
 refreshButton.addEventListener("click", loadLeads);
 loadLeads();
+
+// Google visibility & marketing panel
+const fmt = n => Number(n || 0).toLocaleString();
+function pill(label, state, title) {
+  return `<span class="pill ${state}" title="${safe(title || "")}">${safe(label)}</span>`;
+}
+async function loadGoogle() {
+  const box = document.getElementById("integrations");
+  const gscNotice = document.getElementById("gsc-notice");
+  try {
+    const res = await fetch("/.netlify/functions/google");
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Could not check integrations.");
+    const s = data.status;
+    const gscState = !s.searchConsole.configured ? ["Search Console: not connected", ""]
+      : s.searchConsole.connected ? ["Search Console: connected", "ok"] : ["Search Console: error", "bad"];
+    box.innerHTML = [
+      pill("Lead database: " + (s.supabase.configured ? "configured" : "not configured"), s.supabase.configured ? "ok" : "bad"),
+      pill(gscState[0], gscState[1], s.searchConsole.error),
+      pill("Business Profile: not connected", "", s.businessProfile.note),
+      pill("Google Ads: not connected", "", s.googleAds.note)
+    ].join("");
+    const gsc = data.searchConsole;
+    if (!gsc) {
+      gscNotice.classList.toggle("error", !!s.searchConsole.error);
+      gscNotice.textContent = s.searchConsole.error || "Google Search Console is not connected yet. Add the Google service account variables in Netlify to show search data.";
+      return;
+    }
+    gscNotice.classList.remove("error");
+    gscNotice.textContent = `Google Search data from ${gsc.range.startDate} to ${gsc.range.endDate}.`;
+    document.getElementById("gsc-stats").hidden = false;
+    document.getElementById("gsc-tables").hidden = false;
+    document.getElementById("gsc-clicks").textContent = fmt(gsc.totals.clicks);
+    document.getElementById("gsc-impressions").textContent = fmt(gsc.totals.impressions);
+    document.getElementById("gsc-ctr").textContent = (gsc.totals.ctr * 100).toFixed(1) + "%";
+    document.getElementById("gsc-position").textContent = gsc.totals.position ? gsc.totals.position.toFixed(1) : "—";
+    const rows = (list, empty) => list.length ? list.map(r => `<tr><td>${safe(r.key)}</td><td>${fmt(r.clicks)}</td><td>${fmt(r.impressions)}</td><td>${r.position.toFixed(1)}</td></tr>`).join("")
+      : `<tr><td colspan="4" class="empty">${empty}</td></tr>`;
+    document.getElementById("gsc-queries").innerHTML = rows(gsc.queries, "No search terms recorded yet.");
+    document.getElementById("gsc-pages").innerHTML = rows(gsc.pages, "No pages with Google traffic yet.");
+  } catch (error) {
+    box.innerHTML = pill("Integration check failed", "bad");
+    gscNotice.classList.add("error");
+    gscNotice.textContent = error.message;
+  }
+}
+document.getElementById("google-refresh").addEventListener("click", loadGoogle);
+loadGoogle();
