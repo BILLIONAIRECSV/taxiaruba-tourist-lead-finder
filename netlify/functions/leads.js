@@ -20,7 +20,7 @@ exports.handler = async (event) => {
   const tableUrl = `${supabaseUrl.replace(/\/$/, "")}/rest/v1/leads`;
   const commonHeaders = {
     "apikey": serviceKey,
-    "Authorization": `Bearer ${serviceKey}`,
+
     "Content-Type": "application/json"
   };
 
