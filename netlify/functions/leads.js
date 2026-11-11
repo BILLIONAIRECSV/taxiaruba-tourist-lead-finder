@@ -10,9 +10,21 @@ const reply = (statusCode, payload) => ({
   body: JSON.stringify(payload)
 });
 
+// Turn Supabase errors into actionable messages without exposing secrets.
+const describeFailure = (status, data) => {
+  const message = (data && (data.message || data.error)) || "";
+  if (status === 401 || /invalid api key/i.test(message)) {
+    return "Supabase rejected the API key. Make sure SUPABASE_SERVICE_ROLE_KEY is the service_role key from the same project as SUPABASE_URL, then redeploy.";
+  }
+  if (status === 404 || /relation .* does not exist|could not find the table/i.test(message)) {
+    return "The leads table was not found. Run supabase-schema.sql in the Supabase SQL Editor.";
+  }
+  return "Database request failed" + (message ? ": " + message : ".");
+};
+
 exports.handler = async (event) => {
-  const supabaseUrl = process.env.SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabaseUrl = (process.env.SUPABASE_URL || "").trim().replace(/\/rest\/v1\/?$/, "");
+  const serviceKey = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
   if (!supabaseUrl || !serviceKey) {
     return reply(503, { error: "Database is not configured. Add the Supabase environment variables in Netlify." });
   }
@@ -29,8 +41,8 @@ exports.handler = async (event) => {
       const response = await fetch(`${tableUrl}?select=id,name,source,pickup,destination,travel_date,status,created_at&order=created_at.desc&limit=200`, {
         headers: { ...commonHeaders, "Accept": "application/json" }
       });
-      const data = await response.json();
-      if (!response.ok) return reply(502, { error: "Could not retrieve leads from the database." });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) return reply(502, { error: describeFailure(response.status, data) });
       return reply(200, { leads: data });
     }
 
@@ -63,7 +75,7 @@ exports.handler = async (event) => {
         }])
       });
       const data = await response.json().catch(() => []);
-      if (!response.ok) return reply(502, { error: "Could not save the lead to the database." });
+      if (!response.ok) return reply(502, { error: describeFailure(response.status, data) });
       return reply(201, { ok: true, lead: data[0] || null });
     }
 
