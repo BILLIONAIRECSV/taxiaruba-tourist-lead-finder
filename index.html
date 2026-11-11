@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="TAXIARUBA Tourist Lead Finder dashboard">
+  <title>TAXIARUBA | Tourist Lead Finder</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <script src="/js/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">TAXIARUBA <span>LEAD FINDER</span></a>
+    <span class="environment">Initial setup</span>
+  </header>
+  <main class="container">
+    <section class="intro">
+      <p class="eyebrow">TOURIST LEAD MANAGEMENT</p>
+      <h1>Lead Finder</h1>
+      <p>Collect and manage enquiries from people looking for transportation in Aruba.</p>
+    </section>
+
+    <section class="stats" aria-label="Lead totals">
+      <article class="stat"><span>Total leads</span><strong id="total-count">—</strong></article>
+      <article class="stat"><span>New leads</span><strong id="new-count">—</strong></article>
+      <article class="stat"><span>Contacted</span><strong id="contacted-count">—</strong></article>
+      <article class="stat"><span>Converted</span><strong id="converted-count">—</strong></article>
+    </section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <div><h2>Tourist enquiries</h2><p>Only real enquiries saved to your database will appear here.</p></div>
+        <button id="refresh-button" class="button secondary" type="button">Refresh</button>
+      </div>
+      <div id="notice" class="notice" role="status">Connecting to your lead database…</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Received</th><th>Name</th><th>Source</th><th>Transport details</th><th>Status</th></tr></thead>
+          <tbody id="leads-body"><tr><td colspan="5" class="empty">Loading leads…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel info-panel">
+      <h2>Next step</h2>
+      <p>Connect Supabase and add the environment variables in Netlify. This starter does not scrape websites or send automatic messages. Source integrations and approved response workflows can be added after the database is working.</p>
+    </section>
+    <footer>© <span id="year"></span> TAXIARUBA · Separate internal lead-management application</footer>
+  </main>
+</body>
+</html>
