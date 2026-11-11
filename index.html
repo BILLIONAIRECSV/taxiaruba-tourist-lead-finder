@@ -41,6 +41,25 @@
       </div>
     </section>
 
+    <section class="panel" id="google-panel">
+      <div class="panel-heading">
+        <div><h2>Google visibility &amp; marketing</h2><p>Live data from Google's official APIs. Sections show "Not connected" until credentials are added in Netlify.</p></div>
+        <button id="google-refresh" class="button secondary" type="button">Refresh</button>
+      </div>
+      <div class="integrations" id="integrations"><span class="pill">Checking integrations…</span></div>
+      <div id="gsc-notice" class="notice" role="status">Loading Google Search Console…</div>
+      <div class="stats" id="gsc-stats" hidden>
+        <article class="stat"><span>Google clicks (28 days)</span><strong id="gsc-clicks">—</strong></article>
+        <article class="stat"><span>Impressions</span><strong id="gsc-impressions">—</strong></article>
+        <article class="stat"><span>Click-through rate</span><strong id="gsc-ctr">—</strong></article>
+        <article class="stat"><span>Average position</span><strong id="gsc-position">—</strong></article>
+      </div>
+      <div class="gsc-tables" id="gsc-tables" hidden>
+        <div class="table-wrap"><h3>Top search terms</h3><table class="compact"><thead><tr><th>Search term</th><th>Clicks</th><th>Impressions</th><th>Position</th></tr></thead><tbody id="gsc-queries"></tbody></table></div>
+        <div class="table-wrap"><h3>Top pages</h3><table class="compact"><thead><tr><th>Page</th><th>Clicks</th><th>Impressions</th><th>Position</th></tr></thead><tbody id="gsc-pages"></tbody></table></div>
+      </div>
+    </section>
+
     <section class="panel info-panel">
       <h2>Next step</h2>
       <p>Connect Supabase and add the environment variables in Netlify. This starter does not scrape websites or send automatic messages. Source integrations and approved response workflows can be added after the database is working.</p>
